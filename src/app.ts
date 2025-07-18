@@ -1,9 +1,25 @@
-import express, { Request, Response } from 'express';
+import cors from "cors";
+import express, { Request, Response } from "express";
+import { router } from "./app/routes";
+import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
+import notFound from "./app/middleware/notFound";
 
-const app = express();
+const app = express()
 
-app.get('/',(req : Request ,res : Response )=>{
-    res.status(200).json({message: "success"})
+app.use(express.json())
+app.use(cors())
+
+app.use("/api/v1", router)
+
+app.get("/", (req: Request, res: Response) => {
+    res.status(200).json({
+        message: "Welcome to Tour Management System Backend"
+    })
 })
 
-export default app;
+
+app.use(globalErrorHandler)
+
+app.use(notFound)
+
+export default app
