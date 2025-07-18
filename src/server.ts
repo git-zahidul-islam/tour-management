@@ -2,17 +2,17 @@
 import { Server } from "http";
 import mongoose from "mongoose";
 import app from "./app";
-import { envVar } from "./app/config/env";
+import { envVars } from "./app/config/env";
 
 let server: Server;
 
 const startServer = async () => {
     try {
-        await mongoose.connect(envVar.DB_URL);
+        await mongoose.connect(envVars.DB_URL);
         console.log("Database connect successfully!!!");
 
-        server = app.listen(envVar.PORT, () => {
-            console.log(`Server is listening on the port ${envVar.PORT}`);
+        server = app.listen(envVars.PORT, () => {
+            console.log(`Server is listening on the port ${envVars.PORT}`);
         });
     } catch (error) {
         console.log("Database connect Error!!!",error);
