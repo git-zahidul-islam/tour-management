@@ -3,6 +3,7 @@ import { Server } from "http";
 import mongoose from "mongoose";
 import app from "./app";
 import { envVars } from "./app/config/env";
+import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
 
 let server: Server;
 
@@ -18,7 +19,11 @@ const startServer = async () => {
         console.log("Database connect Error!!!",error);
     }
 };
-startServer();
+
+(async()=>{
+    await startServer();
+    await seedSuperAdmin()
+})()
 
 
 /* 
