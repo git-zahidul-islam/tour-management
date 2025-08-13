@@ -8,31 +8,31 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { generateToken, verifyToken } from "../../utils/jwt";
 import { createNewAccessTokenWithRefreshToken, createUserTokens } from "../../utils/userTokens";
 
-const credentialsLogin = async (payload: Partial<IUser>) => {
-    const { email, password } = payload;
+// const credentialsLogin = async (payload: Partial<IUser>) => {
+//     const { email, password } = payload;
 
-    const isUserExist = await User.findOne({ email })
+//     const isUserExist = await User.findOne({ email })
 
-    if (!isUserExist) {
-        throw new AppError(httpStatus.BAD_REQUEST, "Email does not exist")
-    }
+//     if (!isUserExist) {
+//         throw new AppError(httpStatus.BAD_REQUEST, "Email does not exist")
+//     }
 
-    const isPasswordMatched = await bcrypt.compare(password as string, isUserExist.password as string)
+//     const isPasswordMatched = await bcrypt.compare(password as string, isUserExist.password as string)
 
-    if (!isPasswordMatched) {
-        throw new AppError(httpStatus.BAD_REQUEST, "Incorrect Password")
-    }
+//     if (!isPasswordMatched) {
+//         throw new AppError(httpStatus.BAD_REQUEST, "Incorrect Password")
+//     }
 
-    const userToken = createUserTokens(isUserExist);
+//     const userToken = createUserTokens(isUserExist);
 
-    const { password : pass, ...rest} = isUserExist.toObject();
+//     const { password : pass, ...rest} = isUserExist.toObject();
 
-    return {
-        accesstoken : userToken.accesstoken,
-        refreshToken : userToken.refreshToken,
-        user: rest
-    };
-};
+//     return {
+//         accesstoken : userToken.accesstoken,
+//         refreshToken : userToken.refreshToken,
+//         user: rest
+//     };
+// };
 
 const getNewAccessToken = async (refreshToken : string) => {
 
@@ -62,7 +62,7 @@ const resetPassword = async (oldPassword: string, newPassword: string, decodedTo
 //user - login - token (email, role, _id) - booking / payment / booking / payment cancel - token 
 
 export const AuthServices = {
-    credentialsLogin,
+    // credentialsLogin,
     getNewAccessToken,
     resetPassword
 }
