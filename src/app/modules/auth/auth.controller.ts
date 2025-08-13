@@ -9,29 +9,47 @@ import { setAuthCookie } from "../../utils/setCookie"
 import { JwtPayload } from "jsonwebtoken"
 import { envVars } from "../../config/env"
 import { createUserTokens } from "../../utils/userTokens"
+import passport from "passport"
 
 const credentialsLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const loginInfo = await AuthServices.credentialsLogin(req.body);
 
-    // res.cookie('accessToken', loginInfo.accesstoken, {
-    //     httpOnly: true,
-    //     secure: false
-    // });
+    passport.authenticate("local", async (err: any, user: any, info: any) => {
 
-    // res.cookie('refreshToken', loginInfo.refreshToken, {
-    //     httpOnly: true,
-    //     secure: false
-    // });
+        if (err) {
 
-    setAuthCookie(res,loginInfo)
+            // ❌❌❌❌❌
+            // throw new AppError(401, "Some error")
+            // next(err)
+            // return new AppError(401, err)
 
-    sendResponse(res, {
-        success: true,
-        statusCode: httpStatus.OK,
-        message: "User Logged In Successfully",
-        data: loginInfo,
-    })
-});
+            // ✅✅✅✅
+            // return next(err)
+            // console.log("from err");
+            return next(new AppError(401, err))
+        }
+
+        if (!user) {
+            return next(new AppError(401, info.message))
+        }
+
+        const userTokens = await createUserTokens(user)
+        const { password: pass, ...rest } = user.toObject();
+        setAuthCookie(res, userTokens)
+
+        sendResponse(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: "User Logged In Successfully",
+            data: {
+                accessToken: userTokens.accesstoken,
+                refreshToken: userTokens.refreshToken,
+                user: rest
+
+            },
+        })
+    })(req, res, next)
+
+})
 
 const getNewAccessToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken = req.cookies.refreshToken;
@@ -56,16 +74,16 @@ const getNewAccessToken = catchAsync(async (req: Request, res: Response, next: N
 });
 
 const logout = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    
+
     res.clearCookie('accesstoken', {
-        httpOnly : true,
-        secure : false,
+        httpOnly: true,
+        secure: false,
         sameSite: "lax"
     })
 
     res.clearCookie('refreshToken', {
-        httpOnly : true,
-        secure : false,
+        httpOnly: true,
+        secure: false,
         sameSite: "lax"
     })
 
