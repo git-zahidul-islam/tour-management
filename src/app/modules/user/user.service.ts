@@ -5,6 +5,8 @@ import httpStatus from "http-status-codes"
 import bcrypt from "bcrypt"
 import { envVars } from "../../config/env";
 import { JwtPayload } from "jsonwebtoken";
+import { QueryBuilder } from "../../utils/QueryBuilder";
+import { userSearchableFields } from "./user.constant";
 
 const createUser = async (payload: Partial<IUser>) => {
     const { email , name, password  } = payload;
@@ -72,14 +74,23 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
     return newUpdatedUser;
 };
 
-const getAllUsers = async () => {
-    const users = await User.find({});
-    const totalUsers = await User.countDocuments();
+const getAllUsers = async (query: Record<string, string>) => {
+    const queryBuilder = new QueryBuilder(User.find(),query);
+    const user = queryBuilder
+        .search(userSearchableFields)
+        .filter()
+        .sort()
+        .fields()
+        .paginate()
+
+    const [data,meta] = await Promise.all([
+        user.build(),
+        queryBuilder.getMeta()
+    ])
+
     return {
-        data: users,
-        meta: {
-            total: totalUsers
-        }
+       data,
+       meta
     }
 };
 
