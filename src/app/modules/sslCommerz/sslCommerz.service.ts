@@ -8,8 +8,8 @@ const sslPaymentInit = async (payload: ISSLCommerz) => {
 
     try {
         const data = {
-            store_id: envVars.SSL.STORE_ID,
-            store_passwd: envVars.SSL.STORE_PASS,
+            store_id: envVars.SSL.SSL_STORE_ID,
+            store_passwd: envVars.SSL.SSL_STORE_PASS,
             total_amount: payload.amount,
             currency: "BDT",
             tran_id: payload.transactionId,
