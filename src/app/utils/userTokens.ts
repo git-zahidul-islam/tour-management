@@ -13,11 +13,11 @@ export const createUserTokens = (user : Partial<IUser>) =>{
         role: user.role
     }
     
-    const accesstoken = generateToken(accessPayload, envVars.JWT_ACCESS_SECRET, envVars.JWT_ACCESS_EXPIRES);
+    const accessToken = generateToken(accessPayload, envVars.JWT_ACCESS_SECRET, envVars.JWT_ACCESS_EXPIRES);
     const refreshToken = generateToken(accessPayload, envVars.JWT_REFRESH_SECRET, envVars.JWT_REFRESH_EXPIRES);
 
     return {
-        accesstoken,
+        accessToken,
         refreshToken
     }
 };
