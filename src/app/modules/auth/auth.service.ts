@@ -135,7 +135,7 @@ const setPassword = async (userId: string, plainPassword: string) => {
     )
 
     const credentialProvider: IAuthProvider = {
-        provider: "credentials",
+        provider: "credential",
         providerId: user.email
     }
 
