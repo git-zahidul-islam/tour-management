@@ -4,7 +4,6 @@ import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import { StatsService } from "./stats.service";
 
-
 const getBookingStats = catchAsync(async (req: Request, res: Response) => {
     const stats = await StatsService.getBookingStats();
     sendResponse(res, {

@@ -6,7 +6,7 @@ const paymentSchema = new Schema<IPayment>({
     booking: {
         type: Schema.Types.ObjectId,
         ref: "Booking",
-        // required: true,
+        required: true,
         unique: true,
     },
     transactionId: {

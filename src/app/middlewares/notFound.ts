@@ -9,4 +9,4 @@ const notFound = (req: Request, res: Response) => {
     })
 }
 
-export default notFound;
+export default notFound

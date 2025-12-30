@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response, Router } from "express";
 import passport from "passport";
 import { envVars } from "../../config/env";
+import { checkAuth } from "../../middlewares/checkAuth";
 import { Role } from "../user/user.interface";
 import { AuthControllers } from "./auth.controller";
-import { checkAuth } from "../../middleware/checkAuth";
 
 const router = Router()
 
@@ -19,6 +19,7 @@ router.post("/reset-password", checkAuth(...Object.values(Role)), AuthController
 
 
 //  /booking -> /login -> succesful google login -> /booking frontend
+// /login -> succesful google login -> / frontend
 router.get("/google", async (req: Request, res: Response, next: NextFunction) => {
     const redirect = req.query.redirect || "/"
     passport.authenticate("google", { scope: ["profile", "email"], state: redirect as string })(req, res, next)

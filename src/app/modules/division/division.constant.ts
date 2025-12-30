@@ -1,1 +1,1 @@
-export const divisionSearchableFields = ["name", "description"];
+export const divisionSearchableFields = ["name", "division"];

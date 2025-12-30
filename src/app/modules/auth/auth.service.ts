@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import httpStatus from "http-status-codes";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../config/env";
@@ -67,7 +67,7 @@ const resetPassword = async (payload: Record<string, any>, decodedToken: JwtPayl
         throw new AppError(401, "User does not exist")
     }
 
-    const hashedPassword = await bcrypt.hash(
+    const hashedPassword = await bcryptjs.hash(
         payload.newPassword,
         Number(envVars.BCRYPT_SALT_ROUND)
     )
@@ -129,13 +129,13 @@ const setPassword = async (userId: string, plainPassword: string) => {
         throw new AppError(httpStatus.BAD_REQUEST, "You have already set you password. Now you can change the password from your profile password update")
     }
 
-    const hashedPassword = await bcrypt.hash(
+    const hashedPassword = await bcryptjs.hash(
         plainPassword,
         Number(envVars.BCRYPT_SALT_ROUND)
     )
 
     const credentialProvider: IAuthProvider = {
-        provider: "credential",
+        provider: "credentials",
         providerId: user.email
     }
 
@@ -152,12 +152,12 @@ const changePassword = async (oldPassword: string, newPassword: string, decodedT
 
     const user = await User.findById(decodedToken.userId)
 
-    const isOldPasswordMatch = await bcrypt.compare(oldPassword, user!.password as string)
+    const isOldPasswordMatch = await bcryptjs.compare(oldPassword, user!.password as string)
     if (!isOldPasswordMatch) {
         throw new AppError(httpStatus.UNAUTHORIZED, "Old Password does not match");
     }
 
-    user!.password = await bcrypt.hash(newPassword, Number(envVars.BCRYPT_SALT_ROUND))
+    user!.password = await bcryptjs.hash(newPassword, Number(envVars.BCRYPT_SALT_ROUND))
 
     user!.save();
 

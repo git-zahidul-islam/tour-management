@@ -1,30 +1,33 @@
-import AppError from "../../errorHelpers/AppError";
-import { IAuthProvider, IUser, Role } from "./user.interface";
-import { User } from "./user.model";
-import httpStatus from "http-status-codes"
-import bcrypt from "bcrypt"
+import bcryptjs from "bcryptjs";
+import httpStatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
+import { envVars } from "../../config/env";
+import AppError from "../../errorHelpers/AppError";
 import { QueryBuilder } from "../../utils/QueryBuilder";
 import { userSearchableFields } from "./user.constant";
+import { IAuthProvider, IUser, Role } from "./user.interface";
+import { User } from "./user.model";
 
 const createUser = async (payload: Partial<IUser>) => {
-    const { email , name, password  } = payload;
+    const { email, password, ...rest } = payload;
 
-    const isUserExist = await User.findOne({email});
+    const isUserExist = await User.findOne({ email })
 
-    if(isUserExist){
+    if (isUserExist) {
         throw new AppError(httpStatus.BAD_REQUEST, "User Already Exist")
-    };
+    }
 
-    const hashPassword = await bcrypt.hash(password as string, 10);
-    const authProvider : IAuthProvider = {provider : "credential", providerId : email as string } 
+    const hashedPassword = await bcryptjs.hash(password as string, Number(envVars.BCRYPT_SALT_ROUND))
+
+    const authProvider: IAuthProvider = { provider: "credentials", providerId: email as string }
+
 
     const user = await User.create({
         email,
-        name,
-        password : hashPassword,
-        auths : [authProvider]
-    });
+        password: hashedPassword,
+        auths: [authProvider],
+        ...rest
+    })
 
     return user
 
@@ -78,35 +81,35 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
     return newUpdatedUser
 }
 
+
 const getAllUsers = async (query: Record<string, string>) => {
-    const queryBuilder = new QueryBuilder(User.find(),query);
-    const user = queryBuilder
-        .search(userSearchableFields)
+
+    const queryBuilder = new QueryBuilder(User.find(), query)
+    const usersData = queryBuilder
         .filter()
+        .search(userSearchableFields)
         .sort()
         .fields()
-        .paginate()
+        .paginate();
 
-    const [data,meta] = await Promise.all([
-        user.build(),
+    const [data, meta] = await Promise.all([
+        usersData.build(),
         queryBuilder.getMeta()
     ])
 
     return {
-       data,
-       meta
+        data,
+        meta
     }
 };
-
-const getMe = async (userId: string) => {
-    const user = await User.findById(userId).select("-password");
+const getSingleUser = async (id: string) => {
+    const user = await User.findById(id).select("-password");
     return {
         data: user
     }
 };
-
-const getSingleUser = async (id: string) => {
-    const user = await User.findById(id).select("-password");
+const getMe = async (userId: string) => {
+    const user = await User.findById(userId).select("-password");
     return {
         data: user
     }
@@ -115,7 +118,7 @@ const getSingleUser = async (id: string) => {
 export const UserServices = {
     createUser,
     getAllUsers,
+    getSingleUser,
     updateUser,
-    getMe,
-    getSingleUser
-};
+    getMe
+}
