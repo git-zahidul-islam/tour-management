@@ -2,10 +2,10 @@
 
 // Frontedn -> Form Data with Image File -> Multer -> Form data -> Req (Body + File)
 
-import { v2 as cloudinary , UploadApiResponse } from "cloudinary";
+import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
+import stream from "stream";
 import AppError from "../errorHelpers/AppError";
 import { envVars } from "./env";
-import stream from "stream";
 
 // Amader folder -> image -> form data -> File -> Multer -> Amader project / pc te Nijer ekta folder(temporary) -> Req.file
 

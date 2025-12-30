@@ -11,10 +11,11 @@ const divisionSchema = new Schema<IDivision>({
     timestamps: true
 })
 
+
 divisionSchema.pre("save", async function (next) {
-    if (this.isModified(this.name)) {
+    if (this.isModified("name")) {
         const baseSlug = this.name.toLowerCase().split(" ").join("-")
-        let slug = `${baseSlug}`
+        let slug = `${baseSlug}-division`
 
         let counter = 0;
         while (await Division.exists({ slug })) {
@@ -23,30 +24,27 @@ divisionSchema.pre("save", async function (next) {
 
         this.slug = slug;
     }
-
-    next();
-});
+    next()
+})
 
 divisionSchema.pre("findOneAndUpdate", async function (next) {
-    const divisiton = this.getUpdate() as Partial<IDivision>;
+    const division = this.getUpdate() as Partial<IDivision>
 
-    if (divisiton.name) {
-        if (divisiton.name) {
-            const baseSlug = divisiton.name.toLowerCase().split(" ").join("-")
-            let slug = `${baseSlug}`
+    if (division.name) {
+        const baseSlug = division.name.toLowerCase().split(" ").join("-")
+        let slug = `${baseSlug}-division`
 
-            let counter = 0;
-            while (await Division.exists({ slug })) {
-                slug = `${slug}-${counter++}` // dhaka-division-2
-            }
-
-            divisiton.slug = slug
+        let counter = 0;
+        while (await Division.exists({ slug })) {
+            slug = `${slug}-${counter++}` // dhaka-division-2
         }
-    };
 
-    this.setUpdate(divisiton);
+        division.slug = slug
+    }
 
-    next();
+    this.setUpdate(division)
+
+    next()
 })
 
 export const Division = model<IDivision>("Division", divisionSchema)

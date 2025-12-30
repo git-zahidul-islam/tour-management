@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { envVars } from "../../config/env";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
-import { PaymentService } from "./payment.service";
 import { SSLService } from "../sslCommerz/sslCommerz.service";
+import { PaymentService } from "./payment.service";
 
 const initPayment = catchAsync(async (req: Request, res: Response) => {
     const bookingId = req.params.bookingId;
@@ -52,7 +52,6 @@ const getInvoiceDownloadUrl = catchAsync(
         });
     }
 );
-
 const validatePayment = catchAsync(
     async (req: Request, res: Response) => {
         console.log("sslcommerz ipn url body", req.body);

@@ -10,9 +10,9 @@ export interface ITour {
     images?: string[];
     location?: string;
     costFrom?: number;
-    startDate?: Date;
+    startDate?: Date
     departureLocation?: string;
-    arrivalLocation?:string;
+    arrivalLocation?: string;
     endDate?: Date;
     included?: string[];
     excluded?: string[]
@@ -20,7 +20,7 @@ export interface ITour {
     tourPlan?: string[];
     maxGuest?: number;
     minAge?: number;
-    division: Types.ObjectId,
-    tourType: Types.ObjectId,
+    division: Types.ObjectId
+    tourType: Types.ObjectId
     deleteImages?: string[]
 }

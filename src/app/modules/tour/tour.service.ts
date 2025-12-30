@@ -1,6 +1,7 @@
+
 import { deleteImageFromCLoudinary } from "../../config/cloudinary.config";
 import { QueryBuilder } from "../../utils/QueryBuilder";
-import { tourSearchableFields } from "./tour.constant";
+import { tourSearchableFields, tourTypeSearchableFields } from "./tour.constant";
 import { ITour, ITourType } from "./tour.interface";
 import { Tour, TourType } from "./tour.model";
 
@@ -10,15 +11,15 @@ const createTour = async (payload: ITour) => {
         throw new Error("A tour with this title already exists.");
     }
 
-    const baseSlug = payload.title.toLowerCase().split(" ").join("-")
-    let slug = `${baseSlug}`
+    // const baseSlug = payload.title.toLowerCase().split(" ").join("-")
+    // let slug = `${baseSlug}`
 
-    let counter = 0;
-    while (await Tour.exists({ slug })) {
-        slug = `${slug}-${counter++}` // dhaka-division-2
-    }
+    // let counter = 0;
+    // while (await Tour.exists({ slug })) {
+    //     slug = `${slug}-${counter++}` // dhaka-division-2
+    // }
 
-    payload.slug = slug;
+    // payload.slug = slug;
 
     const tour = await Tour.create(payload)
 
@@ -115,12 +116,18 @@ const getAllTours = async (query: Record<string, string>) => {
         queryBuilder.getMeta()
     ])
 
+
     return {
         data,
         meta
     }
 };
-
+const getSingleTour = async (slug: string) => {
+    const tour = await Tour.findOne({ slug });
+    return {
+        data: tour,
+    }
+};
 const updateTour = async (id: string, payload: Partial<ITour>) => {
 
     const existingTour = await Tour.findById(id);
@@ -129,7 +136,6 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
         throw new Error("Tour not found.");
     }
 
-    // Uncomment start
     // if (payload.title) {
     //     const baseSlug = payload.title.toLowerCase().split(" ").join("-")
     //     let slug = `${baseSlug}`
@@ -141,7 +147,6 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
 
     //     payload.slug = slug
     // }
-    // Uncomment end
 
     if (payload.images && payload.images.length > 0 && existingTour.images && existingTour.images.length > 0) {
         payload.images = [...payload.images, ...existingTour.images]
@@ -168,24 +173,43 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
 
     return updatedTour;
 };
-
 const deleteTour = async (id: string) => {
     return await Tour.findByIdAndDelete(id);
 };
-
 const createTourType = async (payload: ITourType) => {
-    console.log("sss", payload);
-    const existingTourType = await TourType.findOne({ name: payload });
+    const existingTourType = await TourType.findOne({ name: payload.name });
 
     if (existingTourType) {
         throw new Error("Tour type already exists.");
     }
 
-    return await TourType.create({ name: payload });
+    return await TourType.create({ name });
 };
+const getAllTourTypes = async (query: Record<string, string>) => {
+    const queryBuilder = new QueryBuilder(TourType.find(), query)
 
-const getAllTourTypes = async () => {
-    return await TourType.find();
+    const tourTypes = await queryBuilder
+        .search(tourTypeSearchableFields)
+        .filter()
+        .sort()
+        .fields()
+        .paginate()
+
+    const [data, meta] = await Promise.all([
+        tourTypes.build(),
+        queryBuilder.getMeta()
+    ])
+
+    return {
+        data,
+        meta
+    }
+};
+const getSingleTourType = async (id: string) => {
+    const tourType = await TourType.findById(id);
+    return {
+        data: tourType
+    };
 };
 const updateTourType = async (id: string, payload: ITourType) => {
     const existingTourType = await TourType.findById(id);
@@ -211,6 +235,8 @@ export const TourService = {
     deleteTourType,
     updateTourType,
     getAllTourTypes,
+    getSingleTourType,
+    getSingleTour,
     getAllTours,
     updateTour,
     deleteTour,

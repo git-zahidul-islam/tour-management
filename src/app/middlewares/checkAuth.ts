@@ -1,22 +1,23 @@
 import { NextFunction, Request, Response } from "express";
-import AppError from "../errorHelpers/AppError";
-import { verifyToken } from "../utils/jwt";
-import { envVars } from "../config/env";
+import httpStatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
-import httpStatus from "http-status-codes"
-import { User } from "../modules/user/user.model";
+import { envVars } from "../config/env";
+import AppError from "../errorHelpers/AppError";
 import { IsActive } from "../modules/user/user.interface";
+import { User } from "../modules/user/user.model";
+import { verifyToken } from "../utils/jwt";
 
-export const checkAuth = (...authRole : string[]) => async (req: Request, res: Response, next: NextFunction) => {
+export const checkAuth = (...authRoles: string[]) => async (req: Request, res: Response, next: NextFunction) => {
 
     try {
-        const accesstoken = req.headers.authorization;
+        const accessToken = req.headers.authorization;
 
-        if (!accesstoken) {
-            throw new AppError(403, "Token not received");
-        };
+        if (!accessToken) {
+            throw new AppError(403, "No Token Recieved")
+        }
 
-        const verifiedToken = verifyToken(accesstoken, envVars.JWT_ACCESS_SECRET) as JwtPayload;
+
+        const verifiedToken = verifyToken(accessToken, envVars.JWT_ACCESS_SECRET) as JwtPayload
 
         const isUserExist = await User.findOne({ email: verifiedToken.email })
 
@@ -33,14 +34,14 @@ export const checkAuth = (...authRole : string[]) => async (req: Request, res: R
             throw new AppError(httpStatus.BAD_REQUEST, "User is deleted")
         }
 
-        if (!authRole.includes(verifiedToken.role)) {
-            throw new AppError(403, "Tou are not permitted to view this route")
+        if (!authRoles.includes(verifiedToken.role)) {
+            throw new AppError(403, "You are not permitted to view this route!!!")
         }
-        
-        req.user = verifiedToken;
+        req.user = verifiedToken
         next()
-    } catch (error) {
-        next(error);
-    }
 
-};
+    } catch (error) {
+        console.log("jwt error", error);
+        next(error)
+    }
+}

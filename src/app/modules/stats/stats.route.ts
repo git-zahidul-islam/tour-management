@@ -1,7 +1,7 @@
 import express from "express";
+import { checkAuth } from "../../middlewares/checkAuth";
 import { Role } from "../user/user.interface";
 import { StatsController } from "./stats.controller";
-import { checkAuth } from "../../middleware/checkAuth";
 
 const router = express.Router();
 

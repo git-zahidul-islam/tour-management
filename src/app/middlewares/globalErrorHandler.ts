@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from "express";
+import { deleteImageFromCLoudinary } from "../config/cloudinary.config";
 import { envVars } from "../config/env";
 import AppError from "../errorHelpers/AppError";
 import { handleCastError } from "../helpers/handleCastError";
@@ -8,13 +9,12 @@ import { handlerDuplicateError } from "../helpers/handleDuplicateError";
 import { handlerValidationError } from "../helpers/handlerValidationError";
 import { handlerZodError } from "../helpers/handlerZodError";
 import { TErrorSources } from "../interfaces/error.types";
-import { deleteImageFromCLoudinary } from "../config/cloudinary.config";
 
 export const globalErrorHandler = async (err: any, req: Request, res: Response, next: NextFunction) => {
     if (envVars.NODE_ENV === "development") {
         console.log(err);
     }
-
+    console.log({ file: req.files });
     if (req.file) {
         await deleteImageFromCLoudinary(req.file.path)
     }
